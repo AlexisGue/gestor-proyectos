@@ -2,9 +2,10 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
+import { directorioUploads } from '../config/rutas.js';
 
 // Directorio donde se guardarán las portadas.
-const directorio = path.resolve('uploads');
+const directorio = directorioUploads;
 
 // Crear el directorio si todavía no existe.
 if (!fs.existsSync(directorio)) {

@@ -1,6 +1,7 @@
 import Proyecto from "../models/Proyecto.js";
 import fs from "fs/promises";
 import path from "path";
+import { directorioUploads } from "../config/rutas.js";
 
 // Eliminar un archivo de portada del almacenamiento.
 const eliminarArchivoPortada = async (portada) => {
@@ -8,7 +9,7 @@ const eliminarArchivoPortada = async (portada) => {
 
   try {
     const nombreArchivo = path.basename(portada);
-    const rutaArchivo = path.resolve("uploads", nombreArchivo);
+    const rutaArchivo = path.join(directorioUploads, nombreArchivo);
 
     await fs.unlink(rutaArchivo);
   } catch (error) {

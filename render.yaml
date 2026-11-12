@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: gestor-proyectos
+    runtime: node
+    plan: free
+    branch: master
+    healthCheckPath: /api/health
+    buildCommand: npm install --include=dev && npm run build && npm install --prefix backend --omit=dev
+    startCommand: node backend/server.js
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_NAME
+        value: Administrador
+      - key: ADMIN_EMAIL
+        value: admin@proyectos.com
+      - key: MONGODB_URI
+        sync: false

@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import fs from "fs";
 import path from "path";
 
 import conectarDB from "./config/database.js";
@@ -8,16 +9,26 @@ import proyectoRoutes from "./routes/proyectoRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import { proteger } from "./middleware/autenticacion.js";
 import crearAdminInicial from "./config/crearAdminInicial.js";
+import {
+  directorioBackend,
+  directorioDist,
+  directorioUploads,
+} from "./config/rutas.js";
 
-dotenv.config();
+dotenv.config({ path: path.join(directorioBackend, ".env") });
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+// En Render el frontend compilado vive junto a la API, así /api sigue siendo relativo.
+if (fs.existsSync(directorioDist)) {
+  app.use(express.static(directorioDist));
+}
+
 // Publicar las imágenes de portada.
-app.use("/uploads", express.static(path.resolve("uploads")));
+app.use("/uploads", express.static(directorioUploads));
 
 // Autenticación pública.
 app.use("/api/auth", authRoutes);
@@ -55,6 +66,19 @@ app.use((error, req, res, next) => {
   }
 
   next(error);
+});
+
+app.use((req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
+  if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
+    return next();
+  }
+
+  const index = path.join(directorioDist, "index.html");
+
+  if (!fs.existsSync(index)) return next();
+
+  res.sendFile(index);
 });
 
 const iniciarServidor = async () => {
